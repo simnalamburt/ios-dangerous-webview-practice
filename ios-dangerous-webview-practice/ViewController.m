@@ -11,6 +11,8 @@
 @implementation ViewController {
     BOOL _authenticated;
     NSURLRequest *_failedRequest;
+    // TODO: Don't do this
+    NSUInteger _retryCount;
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -29,6 +31,17 @@
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
     NSLog(@"HTTP 요청 발생 : %@ (인증 %s)", request.URL, _authenticated ? "성공" : "실패");
+
+    // TODO: Don't do this
+    BOOL condition =
+        _retryCount < 1 &&
+        [request.URL.scheme isEqualToString:@"https"] &&
+        [request.URL.host isEqualToString:@"www.busan.go.kr"];
+    if (condition) {
+        NSLog(@"강제 인증 우회 시도 (%d번째 시도)", _retryCount);
+        _authenticated = NO;
+        _retryCount += 1;
+    }
 
     if (!_authenticated) {
         NSLog(@"정상적인 방법으로 진행 불가, 우회 시작 : %@", request.URL);
