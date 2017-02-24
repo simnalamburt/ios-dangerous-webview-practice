@@ -12,7 +12,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
     // Do any additional setup after loading the view, typically from a nib.
+    NSURL *url = [NSURL URLWithString:@"https://hyeon.me"];
+    NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
+    [_dangerousWebView loadRequest:requestObj];
 }
 
 @end
