@@ -10,6 +10,10 @@
 
 @implementation ViewController
 
+-(void)viewWillAppear:(BOOL)animated {
+    _dangerousWebView.delegate = self;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -17,6 +21,12 @@
     NSURL *url = [NSURL URLWithString:@"https://m.busan.go.kr"];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
     [_dangerousWebView loadRequest:requestObj];
+}
+
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+{
+    NSLog(@"HTTP 요청 발생  URL: %@", request.URL);
+    return YES;
 }
 
 @end
