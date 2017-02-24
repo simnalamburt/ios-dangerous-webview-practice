@@ -14,7 +14,7 @@
     [super viewDidLoad];
 
     // Do any additional setup after loading the view, typically from a nib.
-    NSURL *url = [NSURL URLWithString:@"https://hyeon.me"];
+    NSURL *url = [NSURL URLWithString:@"https://m.busan.go.kr"];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
     [_dangerousWebView loadRequest:requestObj];
 }
