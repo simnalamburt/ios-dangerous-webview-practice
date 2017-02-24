@@ -43,9 +43,19 @@
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<!-- TODO: 허용범위 좁히기 -->
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>m.busan.go.kr</key>
+			<dict>
+				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key><true/>
+				<key>NSTemporaryExceptionRequiresForwardSecrecy</key><false/>
+			</dict>
+			<key>www.busan.go.kr</key>
+			<dict>
+				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key><true/>
+				<key>NSTemporaryExceptionRequiresForwardSecrecy</key><false/>
+			</dict>
+		</dict>
 	</dict>
 </dict>
 </plist>
