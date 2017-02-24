@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController <UIWebViewDelegate>
+@interface ViewController : UIViewController <UIWebViewDelegate, NSURLConnectionDataDelegate>
 
 @property (strong, nonatomic) IBOutlet UIWebView *dangerousWebView;
 
