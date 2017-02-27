@@ -1,10 +1,8 @@
 #import "ViewController.h"
 
 @implementation ViewController {
-    BOOL _authenticated;
     NSURLRequest *_failedRequest;
-    // TODO: Don't do this
-    NSUInteger _retryCount;
+    NSMutableDictionary *_isTrusted;
 }
 
 @synthesize dangerousWebView;
@@ -12,6 +10,7 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
+    // TODO: 왜 WebViewDelegate가 Self여야할까
     dangerousWebView.delegate = self;
 }
 
@@ -19,6 +18,12 @@
     [super viewDidLoad];
 
     // Do any additional setup after loading the view, typically from a nib.
+    _isTrusted = @{
+        @"www.busan.go.kr": @NO,
+        @"m.busan.go.kr": @NO,
+        @"logger.busan.go.kr": @NO,
+    }.mutableCopy;
+
     NSURL *url = [NSURL URLWithString:@"https://m.busan.go.kr"];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
     [dangerousWebView loadRequest:requestObj];
@@ -28,52 +33,53 @@
     shouldStartLoadWithRequest:(NSURLRequest *)request
                 navigationType:(UIWebViewNavigationType)__unused navigationType
 {
-    NSLog(@"HTTP 요청 발생 : %@ (인증 %s)", request.URL, _authenticated ? "성공" : "실패");
+    NSLog(@"HTTP 요청 발생 : %@", request.URL);
 
-    // TODO: Don't do this
-    BOOL condition =
-        _retryCount < 1 &&
-        [request.URL.scheme isEqualToString:@"https"] &&
-        [request.URL.host isEqualToString:@"www.busan.go.kr"];
-    if (condition) {
-        NSLog(@"강제 인증 우회 시도 (%lu번째 시도)", _retryCount);
-        _authenticated = NO;
-        _retryCount += 1;
-    }
+    // HTTPS 요청이 아닐경우 바로 통과
+    if (![request.URL.scheme isEqualToString:@"https"]) { return YES; }
 
-    if (!_authenticated) {
-        NSLog(@"정상적인 방법으로 진행 불가, 우회 시작 : %@", request.URL);
+    // 이미 강제인증을 거친 도메인일 경우 통과
+    const NSString * const hostname = request.URL.host;
+    id entry = _isTrusted[hostname];
+    if (entry == nil || ((NSNumber*) entry).boolValue) { return YES; }
 
-        _failedRequest = request;
-        [NSURLConnection connectionWithRequest:request delegate:self];
-        return NO;
-    }
-    return YES;
+    // 강제인증 시작
+    NSLog(@"\"%@\" 도메인 강제인증 시도", hostname);
+    _failedRequest = request;
+    // TODO: 왜 NSURLConnectionDelegate가 Self여야할까
+    [NSURLConnection connectionWithRequest:request delegate:self];
+    return NO;
 }
 
 -(void)connection:(NSURLConnection *)__unused connection
     willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 {
-    NSLog(@"인증 챌린지 시작 : %@", _failedRequest.URL);
-    if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
-        // TODO: 특정 도메인만 허용하기
-        // NSURL* baseURL = [NSURL URLWithString:_BaseRequest];
-        NSURL* baseURL = _failedRequest.URL;
+    id entry;
 
-        if ([challenge.protectionSpace.host isEqualToString:baseURL.host]) {
-            NSLog(@"인증서 신뢰하도록 설정 : %@", challenge.protectionSpace.host);
+    if (![challenge.protectionSpace.authenticationMethod
+        isEqualToString:NSURLAuthenticationMethodServerTrust]) { goto FALLBACK; }
 
-            [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
-        } else {
-            NSLog(@"인증서 신뢰하지 않은채로 둠 : %@", challenge.protectionSpace.host);
-        }
-    }
-    [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
+    entry = _isTrusted[challenge.protectionSpace.host];
+    if (entry == nil) { goto FALLBACK; }
+    if (((NSNumber*)entry).boolValue) { goto FALLBACK; }
+
+    NSLog(@"\"%@\"의 인증서를 신뢰하도록 설정함", challenge.protectionSpace.host);
+    [challenge.sender
+        useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]
+        forAuthenticationChallenge:challenge
+    ];
+    _isTrusted[challenge.protectionSpace.host] = @YES;
+    return;
+
+FALLBACK:
+    [challenge.sender
+        performDefaultHandlingForAuthenticationChallenge:challenge];
 }
 
--(void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+-(void)connection:(NSURLConnection *)connection
+    didReceiveResponse:(NSURLResponse *)response
+{
     NSLog(@"응답 수신함 : %@", [response URL]);
-    _authenticated = YES;
     [connection cancel];
     [dangerousWebView loadRequest:_failedRequest];
 }
