@@ -55,6 +55,12 @@
 				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key><true/>
 				<key>NSTemporaryExceptionRequiresForwardSecrecy</key><false/>
 			</dict>
+			<key>logger.busan.go.kr</key>
+			<dict>
+				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key><true/>
+				<key>NSTemporaryExceptionRequiresForwardSecrecy</key><false/>
+				<key>NSTemporaryExceptionMinimumTLSVersion</key><string>TLSv1.0</string>
+			</dict>
 		</dict>
 	</dict>
 </dict>
