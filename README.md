@@ -40,6 +40,12 @@ configure it, server-by-server.
 - [UIWebView to view self signed websites - is it possible?][ref1] - stack overflow
 - [Configuring App Transport Security Exceptions in iOS 9 and OSX 10.11][ref2] - by Steven Peterson
 
+<br>
+
+--------
+*ios-dangerous-webview-practice* is primarily distributed under the terms of
+both the [MIT license] and the [Apache License (Version 2.0)]. See [COPYRIGHT]
+for details.
 
 [`UIWebView`]: https://developer.apple.com/reference/uikit/uiwebview
 [`UIWebViewDelegate`]: https://developer.apple.com/reference/uikit/uiwebviewdelegate
@@ -47,3 +53,6 @@ configure it, server-by-server.
 [Info.plist]: ios-dangerous-webview-practice/Info.plist
 [ref1]: http://stackoverflow.com/q/11573164
 [ref2]: https://ste.vn/2015/06/10/configuring-app-transport-security-ios-9-osx-10-11/
+[MIT license]: LICENSE-MIT
+[Apache License (Version 2.0)]: LICENSE-APACHE
+[COPYRIGHT]: COPYRIGHT
