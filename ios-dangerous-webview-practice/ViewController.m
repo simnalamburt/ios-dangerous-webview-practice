@@ -7,8 +7,12 @@
     NSUInteger _retryCount;
 }
 
+@synthesize dangerousWebView;
+
 -(void)viewWillAppear:(BOOL)animated {
-    _dangerousWebView.delegate = self;
+    [super viewWillAppear:animated];
+
+    dangerousWebView.delegate = self;
 }
 
 - (void)viewDidLoad {
@@ -17,10 +21,12 @@
     // Do any additional setup after loading the view, typically from a nib.
     NSURL *url = [NSURL URLWithString:@"https://m.busan.go.kr"];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
-    [_dangerousWebView loadRequest:requestObj];
+    [dangerousWebView loadRequest:requestObj];
 }
 
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+- (BOOL)webView:(UIWebView *)__unused webView
+    shouldStartLoadWithRequest:(NSURLRequest *)request
+                navigationType:(UIWebViewNavigationType)__unused navigationType
 {
     NSLog(@"HTTP 요청 발생 : %@ (인증 %s)", request.URL, _authenticated ? "성공" : "실패");
 
@@ -30,7 +36,7 @@
         [request.URL.scheme isEqualToString:@"https"] &&
         [request.URL.host isEqualToString:@"www.busan.go.kr"];
     if (condition) {
-        NSLog(@"강제 인증 우회 시도 (%d번째 시도)", _retryCount);
+        NSLog(@"강제 인증 우회 시도 (%lu번째 시도)", _retryCount);
         _authenticated = NO;
         _retryCount += 1;
     }
@@ -39,13 +45,15 @@
         NSLog(@"정상적인 방법으로 진행 불가, 우회 시작 : %@", request.URL);
 
         _failedRequest = request;
-        [[NSURLConnection alloc] initWithRequest:request delegate:self];
+        [NSURLConnection connectionWithRequest:request delegate:self];
         return NO;
     }
     return YES;
 }
 
--(void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
+-(void)connection:(NSURLConnection *)__unused connection
+    willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+{
     NSLog(@"인증 챌린지 시작 : %@", _failedRequest.URL);
     if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]) {
         // TODO: 특정 도메인만 허용하기
@@ -67,7 +75,7 @@
     NSLog(@"응답 수신함 : %@", [response URL]);
     _authenticated = YES;
     [connection cancel];
-    [_dangerousWebView loadRequest:_failedRequest];
+    [dangerousWebView loadRequest:_failedRequest];
 }
 
 @end
