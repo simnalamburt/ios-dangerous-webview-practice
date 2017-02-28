@@ -10,7 +10,6 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
-    // TODO: 왜 WebViewDelegate가 Self여야할까
     dangerousWebView.delegate = self;
 }
 
@@ -33,20 +32,17 @@
     shouldStartLoadWithRequest:(NSURLRequest *)request
                 navigationType:(UIWebViewNavigationType)__unused navigationType
 {
-    NSLog(@"HTTP 요청 발생 : %@", request.URL);
-
-    // HTTPS 요청이 아닐경우 바로 통과
+    // Pass if it is not a HTTPS request
     if (![request.URL.scheme isEqualToString:@"https"]) { return YES; }
 
-    // 이미 강제인증을 거친 도메인일 경우 통과
+    // Pass if its certificate is already trusted
     const NSString * const hostname = request.URL.host;
     id entry = _isTrusted[hostname];
     if (entry == nil || ((NSNumber*) entry).boolValue) { return YES; }
 
-    // 강제인증 시작
-    NSLog(@"\"%@\" 도메인 강제인증 시도", hostname);
+    // Start trusting invalid certificate procedure.
+    // `willSendRequestForAuthenticationChallenge` will be invoked.
     _failedRequest = request;
-    // TODO: 왜 NSURLConnectionDelegate가 Self여야할까
     [NSURLConnection connectionWithRequest:request delegate:self];
     return NO;
 }
@@ -56,30 +52,35 @@
 {
     id entry;
 
+    // Pass if current authentication challenge is not about server trust
     if (![challenge.protectionSpace.authenticationMethod
         isEqualToString:NSURLAuthenticationMethodServerTrust]) { goto FALLBACK; }
 
     entry = _isTrusted[challenge.protectionSpace.host];
+    // Pass if the requested domain is not in the predefined domain list
     if (entry == nil) { goto FALLBACK; }
+    // Pass if the requested domain was already trusted
     if (((NSNumber*)entry).boolValue) { goto FALLBACK; }
 
-    NSLog(@"\"%@\"의 인증서를 신뢰하도록 설정함", challenge.protectionSpace.host);
+    // Trust the certificate
     [challenge.sender
         useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]
         forAuthenticationChallenge:challenge
     ];
+    // Memo that the domain is trusted now
     _isTrusted[challenge.protectionSpace.host] = @YES;
     return;
 
 FALLBACK:
+
+    // Fallback to the default authentication procedure
     [challenge.sender
         performDefaultHandlingForAuthenticationChallenge:challenge];
 }
 
 -(void)connection:(NSURLConnection *)connection
-    didReceiveResponse:(NSURLResponse *)response
+    didReceiveResponse:(NSURLResponse *)__unused response
 {
-    NSLog(@"응답 수신함 : %@", [response URL]);
     [connection cancel];
     [dangerousWebView loadRequest:_failedRequest];
 }
