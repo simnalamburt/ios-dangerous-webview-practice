@@ -21,6 +21,7 @@
         @"www.busan.go.kr": @NO,
         @"m.busan.go.kr": @NO,
         @"logger.busan.go.kr": @NO,
+        @"mail.metro.busan.kr": @NO,
     }.mutableCopy;
 
     NSURL *url = [NSURL URLWithString:@"https://m.busan.go.kr"];
