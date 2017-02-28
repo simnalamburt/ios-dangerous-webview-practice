@@ -45,18 +45,16 @@
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
-			<key>m.busan.go.kr</key>
+			<key>busan.go.kr</key>
 			<dict>
+				<key>NSIncludesSubdomains</key><true/>
 				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key><true/>
 				<key>NSTemporaryExceptionRequiresForwardSecrecy</key><false/>
+				<key>NSTemporaryExceptionMinimumTLSVersion</key><string>TLSv1.0</string>
 			</dict>
-			<key>www.busan.go.kr</key>
+			<key>busan.kr</key>
 			<dict>
-				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key><true/>
-				<key>NSTemporaryExceptionRequiresForwardSecrecy</key><false/>
-			</dict>
-			<key>logger.busan.go.kr</key>
-			<dict>
+				<key>NSIncludesSubdomains</key><true/>
 				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key><true/>
 				<key>NSTemporaryExceptionRequiresForwardSecrecy</key><false/>
 				<key>NSTemporaryExceptionMinimumTLSVersion</key><string>TLSv1.0</string>
