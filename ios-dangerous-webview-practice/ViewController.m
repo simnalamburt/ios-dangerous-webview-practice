@@ -7,16 +7,11 @@
 
 @synthesize dangerousWebView;
 
--(void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-
-    dangerousWebView.delegate = self;
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
 
     // Do any additional setup after loading the view, typically from a nib.
+    _failedRequest = nil;
     _isTrusted = @{
         @"www.busan.go.kr": @NO,
         @"m.busan.go.kr": @NO,
@@ -27,6 +22,12 @@
     NSURL *url = [NSURL URLWithString:@"https://m.busan.go.kr"];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
     [dangerousWebView loadRequest:requestObj];
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+
+    dangerousWebView.delegate = self;
 }
 
 - (BOOL)webView:(UIWebView *)__unused webView
