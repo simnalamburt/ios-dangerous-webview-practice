@@ -13,13 +13,13 @@
     // Do any additional setup after loading the view, typically from a nib.
     _failedRequest = nil;
     _isTrusted = @{
-        @"www.busan.go.kr": @NO,
-        @"m.busan.go.kr": @NO,
-        @"logger.busan.go.kr": @NO,
-        @"mail.metro.busan.kr": @NO,
+        @"www.domain.go.kr": @NO,
+        @"m.domain.go.kr": @NO,
+        @"logger.domain.go.kr": @NO,
+        @"mail.metro.domain.kr": @NO,
     }.mutableCopy;
 
-    NSURL *url = [NSURL URLWithString:@"https://m.busan.go.kr"];
+    NSURL *url = [NSURL URLWithString:@"https://m.domain.go.kr"];
     NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
     [dangerousWebView loadRequest:requestObj];
 }

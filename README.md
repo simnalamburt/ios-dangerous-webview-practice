@@ -22,12 +22,12 @@ configure it, server-by-server.
 <dict>
   <key>NSExceptionDomains</key>
   <dict>
-    <key>m.busan.go.kr</key>
+    <key>m.domain.go.kr</key>
     <dict>
       <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key><true/>
       <key>NSTemporaryExceptionRequiresForwardSecrecy</key><false/>
     </dict>
-    <key>www.busan.go.kr</key>
+    <key>www.domain.go.kr</key>
     <dict>
       <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key><true/>
       <key>NSTemporaryExceptionRequiresForwardSecrecy</key><false/>
